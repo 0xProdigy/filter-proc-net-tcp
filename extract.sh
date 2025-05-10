@@ -1,10 +1,11 @@
 #!/bin/bash
 
-# Extraer los puertos en hexadecimal desde /proc/net/tcp (ignorando el encabezado)
-ports=$(tail -n +2 /proc/net/tcp | awk '{split($2, a, ":"); print a[2]}' | sort -u)
+# Extraer el segundo campo (local_address), ignorando la primera línea (encabezado)
+result=$(awk 'NR > 1 {print $2}' /proc/net/tcp | cut -d: -f2 | sort -u)
 
-# Convertir cada puerto de hexadecimal a decimal
-for hex in $ports; do
-    dec=$(echo "ibase=16; $hex" | bc)
-    echo "Puerto: $dec"
+# Recorrer los puertos hexadecimales y convertirlos a decimal con Bash
+for hex_port in $result; do
+    # Usamos $((16#$hex_port)) para convertir de hex a decimal
+    dec_port=$((16#$hex_port))
+    echo "Puerto: $dec_port"
 done
